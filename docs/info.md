@@ -1,142 +1,249 @@
-# Schrodinger's Seven-Segment
+# TinyMind – A Tiny AI Inference Accelerator
 
-Schrodinger's Seven-Segment is a small educational ASIC project that demonstrates selected ideas from single-qubit quantum computing using ordinary digital logic and one seven-segment display.
+TinyMind is a miniature AI inference accelerator implemented entirely in digital hardware.
 
-The project does not contain a physical qubit and is not a real quantum computer. Instead, it classically models a small set of qubit states and applies simplified gate-transition rules.
+Instead of running software, this chip contains three simple artificial neurons built directly from logic gates.
 
-## How it works
+The goal of the project is to demonstrate one of the most important ideas behind modern AI hardware:
 
-The first three input switches select an operation:
+> **Training happens before fabrication. Inference happens on the chip.**
 
-- `000` — Idle
-- `001` — X gate, or bit flip
-- `010` — H gate, or Hadamard
-- `011` — Measure
-- `100` — Reset to zero
-- `101` — Z gate, or phase flip
-- `110` — Reserved
-- `111` — Reserved
+---
 
-Each press of the manual step-clock button executes the selected operation once.
+# Vocabulary
 
-Internally, the design stores one of four simulated qubit states:
+Before trying the project, here are a few important words.
 
-- `|0>` — definite zero
-- `|1>` — definite one
-- `|+>` — positive-phase superposition
-- `|->` — negative-phase superposition
+## Artificial Neuron
 
-The X, H, and Z operations update the stored state according to simplified single-qubit gate rules.
+An artificial neuron is a small mathematical model inspired by neurons in the human brain.
 
-Measurement behaves as follows:
+It receives several inputs, combines them using a set of weights, and produces a score.
 
-- Measuring `|0>` produces `0`
-- Measuring `|1>` produces `1`
-- Measuring `|+>` or `|->` produces a pseudo-random `0` or `1`
+The neuron with the highest score "wins."
 
-After measurement, the stored state collapses to the displayed result.
+---
 
-A small linear-feedback shift register, or LFSR, is used to create pseudo-random measurement outcomes. This is deterministic digital logic, not true quantum randomness.
+## Feature
 
-The seven-segment display shows either the current state or the selected operation.
+A feature is simply one piece of information given to the AI.
 
-State display conventions:
+In TinyMind, every input switch represents one feature.
 
-- `0` — state `|0>`
-- `1` — state `|1>`
-- `S` — state `|+>`
-- `S.` — state `|->`
+For example:
 
-Operation display conventions:
+- Likes mathematics
+- Likes programming
+- Likes electronics
+- Likes physics
+- Likes data and patterns
+- Likes building things
+- Likes creativity
+- Likes experimentation and research
 
-- `-` — Idle
-- `F` — Flip, representing X
-- `H` — Hadamard
-- `r` — Read, representing measurement
-- `C` — Clear, representing reset
-- `P` — Phase, representing Z
+Each feature is either:
 
-One input switch selects whether the display shows the current qubit state or the selected operation.
+- **0** → No
+- **1** → Yes
 
-## How to test
+---
 
-Use the first three input switches to select an operation.
+## Weight
 
-Use the display-mode switch to choose between:
+A weight tells the neuron how important a feature is.
 
-- Current state view
-- Selected operation view
+TinyMind uses **ternary weights**, meaning every weight is one of only three values.
 
-Use the manual step-clock button to execute the selected operation.
+| Weight | Meaning |
+|---------|----------|
+| +1 | This feature supports the class |
+| 0 | Ignore this feature |
+| -1 | This feature works against the class |
 
-Suggested tests:
+For example, if an AI-oriented neuron thinks mathematics is important, it might assign:
 
-### Test 1: Reset
+```
+Math → +1
+```
 
-1. Select Reset: `100`
-2. Press the step clock
-3. Switch to state view
-4. The display should show `0`
+If it thinks electronics are not important, it might assign:
 
-### Test 2: X gate
+```
+Electronics → 0
+```
 
-1. Reset to `0`
-2. Select X: `001`
-3. Press the step clock
-4. The display should show `1`
+If it thinks building things makes the prediction less likely, it might assign:
 
-### Test 3: Superposition and measurement
+```
+Building → -1
+```
 
-1. Reset to `0`
-2. Select H: `010`
-3. Press the step clock
-4. The state display should show `S`
-5. Select Measure: `011`
-6. Press the step clock
-7. The display should show either `0` or `1`
+---
 
-### Test 4: Two Hadamard gates
+## Training
 
-1. Reset to `0`
-2. Apply H
-3. Apply H again
-4. Measure
-5. The result should be `0`
+Training is the process of learning the best weights.
 
-This demonstrates that two Hadamard operations cancel each other.
+Normally this happens on a computer or GPU using many examples.
 
-### Test 5: Phase and interference
+TinyMind **does not perform training.**
 
-1. Reset to `0`
-2. Apply H
-3. Apply Z
-4. Apply H
-5. Measure
-6. The result should be `1`
+Its weights are permanently built into the hardware.
 
-This demonstrates that relative phase can affect the final measurement result.
+---
 
-## External hardware
+## Inference
+
+Inference means making a prediction using already-learned weights.
+
+This is exactly what TinyMind does.
+
+Every time the switches change, the chip immediately performs a new prediction.
+
+---
+
+# How TinyMind Works
+
+TinyMind contains **three artificial neurons** running in parallel.
+
+Each neuron represents one possible class.
+
+```
+              Eight Input Features
+                      │
+                      ▼
+         ┌────────────────────────┐
+         │   AI Neuron            │
+         └────────────────────────┘
+                      │
+                      ▼
+         ┌────────────────────────┐
+         │ Hardware Neuron        │
+         └────────────────────────┘
+                      │
+                      ▼
+         ┌────────────────────────┐
+         │ Creative Neuron        │
+         └────────────────────────┘
+                      │
+                      ▼
+            Compare the three scores
+                      │
+                      ▼
+            Highest score wins
+```
+
+Each neuron calculates a score using its own fixed weights.
+
+The neuron with the highest score becomes the prediction.
+
+---
+
+# Display
+
+The Tiny Tapeout demonstration board has only a single seven-segment display.
+
+TinyMind alternates between two views whenever the step clock is pressed.
+
+## View 1 – Predicted Class
+
+The display shows:
+
+| Display | Meaning |
+|----------|----------|
+| A | AI-oriented |
+| H | Hardware-oriented |
+| C | Creative-oriented |
+
+If the decimal point is illuminated, the prediction was very close.
+
+---
+
+## View 2 – Confidence Margin
+
+The display shows a digit from **0–9**.
+
+This is calculated as:
+
+```
+Winning Score − Second Highest Score
+```
+
+A larger number means the AI made a stronger decision.
+
+A smaller number means two classes produced similar scores.
+
+---
+
+# Example
+
+Suppose the switches are:
+
+| Feature | Value |
+|----------|------|
+| Mathematics | Yes |
+| Programming | Yes |
+| Electronics | No |
+| Physics | No |
+| Data | Yes |
+| Building | No |
+| Creativity | No |
+| Research | Yes |
+
+Internally, the three neurons might calculate:
+
+| Class | Score |
+|--------|------:|
+| AI | **5** |
+| Hardware | 2 |
+| Creative | 1 |
+
+The display first shows:
+
+```
+A
+```
+
+Press the step clock once.
+
+The display changes to:
+
+```
+3
+```
+
+This means the AI class won by three points.
+
+---
+
+# Why This Is an AI Accelerator
+
+Modern AI accelerators perform large numbers of neural-network calculations in dedicated hardware.
+
+TinyMind demonstrates the exact same idea on a much smaller scale.
+
+Instead of billions of neurons, TinyMind contains three.
+
+Instead of millions of weights, TinyMind contains a handful of fixed ternary weights.
+
+Although extremely small, it illustrates the same fundamental inference process used by modern AI hardware.
+
+---
+
+# How to Test
+
+1. Move any combination of the eight input switches.
+2. Observe the predicted class on the seven-segment display.
+3. Press the step clock.
+4. Observe the confidence margin.
+5. Continue experimenting with different feature combinations.
+
+Notice how changing only one feature can sometimes change the prediction.
+
+---
+
+# External Hardware
+
+This project uses only the standard Tiny Tapeout demonstration board.
 
 No additional external hardware is required.
-
-The project uses the standard Tiny Tapeout demo-board resources:
-
-- Eight input switches
-- Manual step-clock button
-- Reset button
-- One seven-segment display
-
-## Limitations
-
-This project is a classical educational model.
-
-It does not:
-
-- Contain a physical qubit
-- Simulate arbitrary quantum amplitudes
-- Model decoherence or noise
-- Produce true quantum randomness
-- Support multi-qubit entanglement
-
-It is intended to demonstrate the basic ideas of state preparation, gate sequencing, superposition, phase, interference, measurement, and collapse.
