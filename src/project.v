@@ -30,7 +30,7 @@
 
 `default_nettype none
 
-module tt_um_example (
+module tt_um_sishi888_tinymind (
     input  wire [7:0] ui_in,    // Eight binary AI features
     output wire [7:0] uo_out,   // Seven-segment display
     input  wire [7:0] uio_in,   // Unused bidirectional inputs
