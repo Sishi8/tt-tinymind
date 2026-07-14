@@ -2,7 +2,7 @@
 project:
   title: "Schrodinger's Seven-Segment"
   author: "Sishi"
-  discord: ""
+  discord: "Sishi888"
   description: "Interactive classical single-qubit simulator using a seven-segment display."
   language: "Verilog"
 
